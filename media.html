@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bioskop Mini Kita // Romantis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600&family=Pacifico&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #dbeafe;
+  --bg2: #bfdbfe;
+  --purple: #38bdf8;
+  --pd: #1e40af;
+  --pink: #93c5fd;
+  --pkd: #2563eb;
+  --cream: #f0f9ff;
+  --ink: #0f172a;
+  --muted: #475569;
+  --wh: #ffffff;
+  --gold: #fbbf24;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: #f0f9ff;
+  font-family: 'Nunito', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 22%, #0a162b 0%, #060e1d 58%, #03070f 100%);
+  position: relative;
+  transition: background 0.8s ease;
+}
+
+/* Pixel grid */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.12) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* CRT scanlines */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+  opacity: 0.04;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0px, rgba(0, 0, 0, 0.3) 1px, transparent 1px, transparent 3px);
+}
+
+/* Pixel borders */
+.px-border {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 8px;
+  z-index: 600;
+}
+.px-border-t {
+  top: 0;
+  background: repeating-linear-gradient(90deg, var(--pkd) 0 8px, var(--pd) 8px 16px, var(--pink) 16px 24px, var(--purple) 24px 32px);
+}
+.px-border-b {
+  bottom: 0;
+  background: repeating-linear-gradient(90deg, var(--purple) 0 8px, var(--pink) 8px 16px, var(--pd) 16px 24px, var(--pkd) 24px 32px);
+}
+
+/* ─── 3D DOOR PAGE TRANSITION OVERLAY ─── */
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  background: #070e1c;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease;
+}
+.page-transition.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.page-transition .tr-door {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  perspective: 1400px;
+}
+.page-transition .tr-panel {
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, #1e3a8a, #2563eb 45%, #1e3a8a);
+  border: 5px solid #60a5fa;
+  box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.45);
+  transition: transform 0.9s cubic-bezier(0.55, 0, 0.2, 1);
+}
+.page-transition .tr-panel.left {
+  transform-origin: left center;
+}
+.page-transition .tr-panel.right {
+  transform-origin: right center;
+}
+.page-transition.open .left {
+  transform: rotateY(-105deg);
+}
+.page-transition.open .right {
+  transform: rotateY(105deg);
+}
+.page-transition .tr-light {
+  position: absolute;
+  inset: 10%;
+  background: radial-gradient(circle, rgba(240, 249, 255, 0.98), rgba(96, 165, 250, 0.45) 35%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease 0.3s;
+}
+.page-transition.open .tr-light {
+  opacity: 1;
+}
+
+/* ─── TOP BAR ─── */
+.media-topbar {
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.media-nav-btn {
+  border: 3px solid #1e40af;
+  background: #0f172a;
+  color: #f0f9ff;
+  box-shadow: 3px 3px 0 #03070f;
+  padding: 8px 18px;
+  cursor: pointer;
+  font: 20px 'VT323', monospace;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+  user-select: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.media-nav-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #03070f;
+}
+.media-nav-btn.main {
+  background: var(--pkd);
+  color: #fff;
+  border-color: #60a5fa;
+}
+.theater-badge {
+  font: 20px 'VT323', monospace;
+  color: #bae6fd;
+  letter-spacing: 0.1em;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 6px 14px;
+  border: 2px solid var(--pkd);
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.35);
+}
+
+/* ─── THEATER STAGE LAYOUT (THEATER + SIDE PHOTO STREAMS) ─── */
+.theater-stage-wrap {
+  display: grid;
+  grid-template-areas: "left main right";
+  grid-template-columns: 200px minmax(0, 860px) 200px;
+  justify-content: center;
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+  position: relative;
+  z-index: 25;
+}
+
+.stream-left {
+  grid-area: left;
+}
+
+#mediaMain {
+  grid-area: main;
+  width: 100%;
+  max-width: 860px;
+  margin: 0;
+  padding: 10px 0 40px;
+  position: relative;
+  z-index: 26;
+  min-width: 0;
+}
+
+.stream-right {
+  grid-area: right;
+}
+
+/* ─── SCROLLING PHOTOBOX STREAMS (LEFT & RIGHT) ─── */
+.photo-stream {
+  width: 100%;
+  position: sticky;
+  top: 75px;
+  height: min(780px, 86vh);
+  overflow: hidden;
+  z-index: 35; /* Di atas overlay redup agar foto TIDAK terlalu redup! */
+  opacity: 0.95;
+  transition: opacity 0.8s ease, filter 0.8s ease;
+  contain: paint layout;
+  position: relative;
+}
+
+/* Gradient fade top & bottom - bebas repainting GPU / anti-blink */
+.photo-stream::before,
+.photo-stream::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 65px;
+  z-index: 10;
+  pointer-events: none;
+}
+.photo-stream::before {
+  top: 0;
+  background: linear-gradient(180deg, #0a162b 15%, transparent 100%);
+}
+.photo-stream::after {
+  bottom: 0;
+  background: linear-gradient(0deg, #0a162b 15%, transparent 100%);
+}
+
+/* Saat bioskop redup / media play: FOTO TETAP TERANG & BERCAHAYA */
+body.theater-dimmed .photo-stream {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.55));
+}
+
+.stream-track {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  animation: scrollUpPhotos 80s linear infinite;
+  animation-play-state: paused; /* Berhenti sampai media di-play! */
+}
+
+/* Sedikit variasi durasi antara kiri dan kanan agar scrolling terlihat natural */
+.stream-left .stream-track {
+  animation-duration: 78s;
+}
+.stream-right .stream-track {
+  animation-duration: 86s;
+  animation-delay: -8s;
+}
+
+/* Animasi bergulir aktif saat media diputar */
+.photo-stream.scrolling .stream-track {
+  animation-play-state: running;
+}
+
+@keyframes scrollUpPhotos {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+@keyframes scrollLeftPhotos {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes scrollRightPhotos {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ─── STYLE BORDER CETAK PHOTOBOX ─── */
+.photobox-card {
+  background: #ffffff;
+  padding: 8px 8px 14px 8px;
+  border: 2px solid #cbd5e1;
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    2px 2px 0 rgba(30, 64, 175, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  user-select: none;
+}
+
+/* Kemiringan organik ala foto polaroid/photobox */
+.stream-left .photobox-card:nth-child(odd) {
+  transform: rotate(-1.5deg);
+}
+.stream-left .photobox-card:nth-child(even) {
+  transform: rotate(1.8deg);
+}
+.stream-right .photobox-card:nth-child(odd) {
+  transform: rotate(1.5deg);
+}
+.stream-right .photobox-card:nth-child(even) {
+  transform: rotate(-1.7deg);
+}
+
+.photobox-card:hover {
+  transform: scale(1.08) rotate(0deg) !important;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.8), 0 0 0 2px #fff;
+}
+
+/* Foto mempertahankan ukuran & aspek rasio aslinya (height: auto) */
+.photobox-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  background: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+.photobox-bottom {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.photobox-label {
+  font: 16px 'VT323', monospace;
+  color: var(--pkd);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photobox-deco {
+  color: var(--pink);
+  font-size: 15px;
+}
+
+/* Placeholder photobox jika foto belum dimasukkan */
+.photobox-ph {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #f0f9ff, #dbeafe);
+  border: 1px dashed var(--pkd);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--pd);
+  padding: 8px;
+  text-align: center;
+}
+.photobox-ph span {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.photobox-ph p {
+  font: 13px 'VT323', monospace;
+  color: var(--pd);
+}
+
+/* Penyesuaian responsif untuk tablet & smartphone */
+@media(max-width: 1200px) {
+  .theater-stage-wrap {
+    grid-template-columns: 155px minmax(0, 720px) 155px;
+    gap: 16px;
+  }
+}
+@media(max-width: 980px) {
+  .theater-stage-wrap {
+    grid-template-columns: 125px minmax(0, 600px) 125px;
+    gap: 12px;
+  }
+  .photobox-card {
+    padding: 6px 6px 12px 6px;
+  }
+}
+@media(max-width: 820px) {
+  /* Tampilan Mobile:
+     1. Judul di atas
+     2. Gulungan foto atas menyamping (tepat di bawah judul, tepat di atas lampu)
+     3. Ruang bioskop (lampu, layar lebar, konsol rapi, 5 kursi compact)
+     4. Gulungan foto bawah menyamping (arah berlawanan)
+  */
+  #mediaMain {
+    display: contents;
+  }
+
+  .theater-stage-wrap {
+    display: grid;
+    grid-template-areas:
+      "header"
+      "top-stream"
+      "cinema"
+      "bot-stream";
+    grid-template-columns: 100%;
+    gap: 6px;
+    padding: 0 6px 18px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .theater-header {
+    grid-area: header;
+    margin-bottom: 0;
+  }
+  .theater-header .kicker {
+    font-size: 15px;
+  }
+  .theater-header h1 {
+    font-size: 1.65rem;
+    margin: 2px 0;
+  }
+  .theater-header p {
+    font-size: 0.88rem;
+    margin: 0 0 4px;
+  }
+
+  /* Strip foto atas: tepat di bawah judul & di atas lampu */
+  .stream-left {
+    grid-area: top-stream;
+  }
+
+  /* Ruang bioskop utama */
+  .cinema-room {
+    grid-area: cinema;
+    width: 100%;
+    padding: 4px 6px;
+    border-radius: 4px;
+  }
+
+  .screen-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-width: 3px;
+  }
+
+  /* Strip foto bawah: tepat di bawah kursi */
+  .stream-right {
+    grid-area: bot-stream;
+  }
+
+  /* Ukuran strip foto horizontal di mobile */
+  .photo-stream {
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 118px;
+    overflow: hidden;
+    margin: 0;
+    contain: paint layout;
+  }
+
+  /* Gradien fade halus di tepi kiri dan kanan strip horizontal */
+  .photo-stream::before {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: 28px;
+    height: 100%;
+    background: linear-gradient(90deg, #0a162b 25%, transparent 100%);
+  }
+  .photo-stream::after {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: 28px;
+    height: 100%;
+    background: linear-gradient(-90deg, #0a162b 25%, transparent 100%);
+  }
+
+  /* Jalur foto bergulir horizontal */
+  .stream-track {
+    flex-direction: row;
+    gap: 10px;
+    width: max-content;
+    align-items: center;
+    animation-play-state: paused;
+  }
+
+  /* Arah gulir BERLAWANAN: Atas ke kiri, Bawah ke kanan */
+  .stream-left .stream-track {
+    animation: scrollLeftPhotos 46s linear infinite;
+    animation-play-state: paused;
+  }
+  .stream-right .stream-track {
+    animation: scrollRightPhotos 46s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .photo-stream.scrolling .stream-track {
+    animation-play-state: running;
+  }
+
+  /* Kartu photobox compact & proporsional di HP */
+  .photobox-card {
+    flex: 0 0 auto;
+    width: 78px;
+    padding: 3px 3px 8px 3px;
+    margin: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), 1px 1px 0 rgba(30, 64, 175, 0.25);
+  }
+
+  .photobox-img {
+    width: 100%;
+    height: 72px;
+    object-fit: contain;
+    background: #0f172a;
+  }
+
+  .photobox-bottom {
+    margin-top: 2px;
+    padding: 0 1px;
+  }
+
+  .photobox-label {
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+
+  .photobox-deco {
+    font-size: 11px;
+  }
+
+  /* Tombol buka tirai di HP pas dan proporsional */
+  .curtain-hint {
+    padding: 6px 12px;
+    max-width: 78%;
+  }
+  .curtain-hint span {
+    font-size: 15px;
+    letter-spacing: 0.04em;
+  }
+  .curtain-hint canvas {
+    width: 22px;
+    height: 18px;
+    margin: 0 auto 2px;
+  }
+
+  /* Tombol tutup tirai di HP: kecil, simpel & elegan di pojok atas */
+  .curtain-close-btn {
+    top: 5px;
+    right: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Kursi bioskop: kurangi jumlah kursi di mobile agar lebih banyak space */
+  .seat-row.row-back {
+    display: none !important;
+  }
+  .aisle-lights-left,
+  .aisle-lights-right {
+    display: none !important;
+  }
+  /* Baris depan: sembunyikan kursi tepi (hanya tampilkan 5 kursi tengah) */
+  .seat-row.row-front .seat:nth-child(1),
+  .seat-row.row-front .seat:nth-child(2),
+  .seat-row.row-front .seat:nth-child(8),
+  .seat-row.row-front .seat:nth-child(9) {
+    display: none !important;
+  }
+
+  .seat-area {
+    padding: 4px 6px 5px;
+    margin-top: -6px;
+  }
+  .seat-floor {
+    height: 3px;
+    margin-bottom: 4px;
+  }
+  .seat-row {
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+  .seat {
+    width: 26px;
+    height: 20px;
+    border-width: 1.5px;
+  }
+  .seat::before {
+    height: 5px;
+    top: -4px;
+    left: 1px;
+    right: 1px;
+    border-width: 1.5px;
+  }
+  .seat.selected::after {
+    font-size: 11px;
+    top: -6px;
+  }
+  .seat-hint {
+    font-size: 11px;
+    margin-top: 2px;
+    letter-spacing: 0;
+  }
+
+  /* Konsol tombol: play, slider linimasa, mute proporsional dan tidak besar */
+  .theater-console {
+    padding: 5px 6px;
+    gap: 5px;
+  }
+  .v-btn {
+    min-width: 30px;
+    height: 26px;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-width: 1.5px;
+    box-shadow: 1px 1px 0 var(--pd);
+  }
+  .v-btn.main {
+    min-width: 44px;
+    font-size: 12px;
+  }
+  .v-time {
+    font-size: 11px;
+  }
+  .v-prog {
+    height: 5px;
+    min-width: 55px;
+    border-width: 1.5px;
+  }
+  .v-prog::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    box-shadow: 0 0 0 1.5px var(--pd);
+  }
+  .v-vol {
+    display: none;
+  }
+}
+
+.theater-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.theater-header .kicker {
+  font: 18px 'VT323', monospace;
+  color: var(--pink);
+  letter-spacing: 0.14em;
+}
+.theater-header h1 {
+  font-family: 'Fredoka', sans-serif;
+  color: #fff;
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  margin: 6px 0 8px;
+  text-shadow: 0 0 20px rgba(239, 143, 201, 0.6), 3px 3px 0 #3a1658;
+}
+.theater-header p {
+  color: #d8badf;
+  font-size: 1.05rem;
+}
+
+/* ─── THEATER CINEMA ROOM ─── */
+.cinema-room {
+  width: 100%;
+  background: linear-gradient(180deg, #180a2c 0%, #260f3e 50%, #3a1658 100%);
+  border: 4px solid var(--pd);
+  box-shadow: 
+    0 0 0 6px #180a2c,
+    0 0 0 10px var(--pd),
+    8px 12px 0 rgba(104, 70, 142, 0.35);
+  position: relative;
+  padding: 24px 24px 0;
+  transition: background 0.6s ease;
+  overflow: visible;
+}
+
+/* Pixel ceiling sconces */
+.cinema-lights {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+.cinema-light {
+  width: 16px;
+  height: 16px;
+  background: var(--pkd);
+  border: 2px solid var(--pd);
+  box-shadow: 0 0 10px 5px rgba(239, 143, 201, 0.5);
+  animation: light-flicker 3s ease-in-out infinite;
+  transition: opacity 0.6s, box-shadow 0.6s;
+}
+.cinema-light:nth-child(2) { animation-delay: -0.7s; }
+.cinema-light:nth-child(3) { animation-delay: -1.4s; }
+.cinema-light:nth-child(4) { animation-delay: -2.1s; }
+.cinema-light:nth-child(5) { animation-delay: -0.3s; }
+.cinema-light:nth-child(6) { animation-delay: -1.8s; }
+
+@keyframes light-flicker {
+  0%, 100% { opacity: 1; }
+  48% { opacity: 0.85; }
+  50% { opacity: 0.45; }
+  52% { opacity: 0.9; }
+}
+
+/* ─── FULLPAGE THEATER AMBIENT DIM OVERLAY ─── */
+.theater-dim-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(16, 5, 25, 0.65) 0%, rgba(8, 2, 14, 0.82) 100%);
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body.theater-dimmed .theater-dim-overlay {
+  opacity: 1;
+}
+
+/* When theater is dimmed: surroundings softly turn down like a real cinema */
+body.theater-dimmed {
+  background: radial-gradient(circle at 50% 22%, #14051f 0%, #0c0414 60%, #050209 100%);
+}
+body.theater-dimmed .media-topbar {
+  opacity: 0.35;
+  transition: opacity 0.8s ease;
+}
+body.theater-dimmed .media-topbar:hover {
+  opacity: 1;
+}
+body.theater-dimmed .theater-header {
+  opacity: 0.25;
+  transition: opacity 0.8s ease;
+}
+body.theater-dimmed .px-border {
+  opacity: 0.25;
+  transition: opacity 0.8s ease;
+}
+body.theater-dimmed .video-picker-wrap {
+  opacity: 0.35;
+  transition: opacity 0.8s ease;
+}
+body.theater-dimmed .video-picker-wrap:hover {
+  opacity: 1;
+}
+
+/* ─── DECORATIVE LIGHTS (TURN ON / ILLUMINATE WHEN DIMMED) ─── */
+.theater-fairy-lights {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 16px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 22;
+}
+.fairy-bulb {
+  width: 9px;
+  height: 9px;
+  background: #ecd5b8;
+  border: 1px solid var(--pd);
+  border-radius: 50%;
+  opacity: 0.25;
+  transition: all 0.8s ease;
+}
+.fairy-bulb:nth-child(odd) { animation-delay: -0.6s; }
+.fairy-bulb:nth-child(3n) { animation-delay: -1.2s; }
+
+/* When dimmed: Fairy lights turn on with enchanting warm golden glow! */
+body.theater-dimmed .fairy-bulb {
+  opacity: 1;
+  background: var(--gold);
+  border-color: #fff;
+  box-shadow: 0 0 10px 4px rgba(244, 207, 104, 0.85);
+  animation: bulb-twinkle 2s ease-in-out infinite alternate;
+}
+@keyframes bulb-twinkle {
+  0% { transform: scale(0.9); opacity: 0.75; box-shadow: 0 0 8px 3px rgba(244, 207, 104, 0.6); }
+  100% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 14px 6px rgba(244, 207, 104, 0.95); }
+}
+
+/* Floor aisle pathway guide lights */
+.aisle-lights-left, .aisle-lights-right {
+  position: absolute;
+  top: 32px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  z-index: 38;
+}
+.aisle-lights-left { left: 14px; }
+.aisle-lights-right { right: 14px; }
+
+.aisle-dot {
+  width: 10px;
+  height: 10px;
+  background: #3d1a5e;
+  border: 1.5px solid var(--pd);
+  opacity: 0.3;
+  transition: all 0.8s ease;
+}
+body.theater-dimmed .aisle-dot {
+  opacity: 1;
+  background: var(--pink);
+  border-color: #fff;
+  box-shadow: 0 0 10px 4px rgba(239, 143, 201, 0.85);
+  animation: aisle-glow 2.5s ease-in-out infinite alternate;
+}
+@keyframes aisle-glow {
+  from { opacity: 0.75; box-shadow: 0 0 6px 2px rgba(239, 143, 201, 0.6); }
+  to { opacity: 1; box-shadow: 0 0 14px 5px rgba(239, 143, 201, 0.95); }
+}
+
+/* ─── DIMMED ATMOSPHERE ("LIGHTS DOWN") ─── */
+.cinema-room {
+  position: relative;
+  z-index: 28;
+  transition: background 0.8s ease, box-shadow 0.8s ease;
+}
+.cinema-room.cinema-dim {
+  background: linear-gradient(180deg, #0a0312 0%, #12051d 50%, #1a072a 100%);
+  box-shadow: 
+    0 0 0 6px #0a0312,
+    0 0 0 10px #4d2b6b,
+    0 0 50px rgba(239, 143, 201, 0.35),
+    10px 16px 0 rgba(0, 0, 0, 0.6);
+}
+.cinema-room.cinema-dim .cinema-light {
+  opacity: 0.12;
+  box-shadow: 0 0 3px 1px rgba(239, 143, 201, 0.2);
+  animation: none;
+}
+/* Screen Frame ALWAYS stays 100% bright with no dimming */
+.cinema-room .screen-frame {
+  position: relative;
+  z-index: 40;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.cinema-room.cinema-dim .screen-frame {
+  box-shadow: 
+    inset 0 0 30px rgba(0, 0, 0, 0.8),
+    0 0 0 3px var(--pd),
+    0 0 45px rgba(239, 143, 201, 0.45),
+    0 0 90px rgba(104, 70, 142, 0.35);
+}
+.cinema-room.cinema-dim .seat-area {
+  background: linear-gradient(180deg, #10041f, #080211);
+  transition: background 0.8s ease;
+}
+.cinema-room.cinema-dim .seat-hint {
+  opacity: 0.45;
+}
+
+/* ─── SCREEN FRAME ─── */
+.screen-frame {
+  position: relative;
+  width: 100%;
+  border: 5px solid #0d0618;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 0 0 3px var(--pd);
+  background: #000;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  z-index: 20;
+}
+
+.screen-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 1px, transparent 1px, transparent 3px);
+}
+
+.cinema-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+
+.cinema-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #08020d;
+  display: none;
+  z-index: 5;
+}
+
+#fallbackCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  z-index: 6;
+}
+
+/* ─── INTERACTIVE VELVET CURTAINS ─── */
+.curtain-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+}
+.curtain-l, .curtain-r {
+  width: 50%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #0c1b33 0px,
+    #132b52 8px,
+    #1d4077 16px,
+    #2563eb 22px,
+    #1a3a6b 28px,
+    #0c1b33 36px
+  );
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.45);
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+/* Curtain fold shadow */
+.curtain-l::before, .curtain-r::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.curtain-l::before { right: 0; }
+.curtain-r::before { left: 0; }
+
+/* Top Curtain Golden Rod */
+.curtain-l::after, .curtain-r::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(90deg, #d4af37, #f6e6ab 50%, #b38b1e);
+  border-bottom: 2px solid var(--pd);
+}
+
+/* Open Curtains */
+.curtain-wrap.open .curtain-l {
+  transform: translateX(-92%);
+}
+.curtain-wrap.open .curtain-r {
+  transform: translateX(92%);
+}
+.curtain-wrap.open {
+  pointer-events: none;
+}
+
+/* Curtain Center Badge / Hint */
+.curtain-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 35;
+  text-align: center;
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 12px 20px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 3px solid var(--pink);
+  box-shadow: 4px 4px 0 var(--pd);
+  transition: transform 0.2s, opacity 0.3s;
+}
+.curtain-hint:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.curtain-hint span {
+  display: block;
+  color: #fff;
+  font: 22px 'VT323', monospace;
+  letter-spacing: 0.1em;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+.curtain-hint canvas {
+  display: block;
+  margin: 0 auto 6px;
+  image-rendering: pixelated;
+}
+.curtain-wrap.open .curtain-hint {
+  display: none;
+}
+
+/* ─── CLOSE CURTAINS BUTTON ─── */
+.curtain-close-btn {
+  display: none;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 40;
+  border: 2px solid #fff;
+  background: rgba(30, 64, 175, 0.92);
+  color: #fff;
+  padding: 6px 14px;
+  cursor: pointer;
+  font: 18px 'VT323', monospace;
+  letter-spacing: 0.05em;
+  box-shadow: 3px 3px 0 #070e1c;
+  transition: transform 0.15s, background 0.15s;
+}
+.curtain-close-btn:hover {
+  background: #2563eb;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #1a0d2e;
+}
+.curtain-wrap.open ~ .curtain-close-btn {
+  display: block;
+}
+
+/* ─── INTEGRATED THEATER CONTROLS ─── */
+.theater-console {
+  background: #070e1c;
+  border: 3px solid var(--pd);
+  border-top: none;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 25;
+}
+.v-btn {
+  min-width: 48px;
+  height: 36px;
+  padding: 4px 12px;
+  border: 2px solid var(--pd);
+  background: #0f172a;
+  color: var(--pink);
+  box-shadow: 2px 2px 0 var(--pd);
+  cursor: pointer;
+  font: 18px 'VT323', monospace;
+  transition: transform 0.1s;
+  user-select: none;
+}
+.v-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--pd);
+}
+.v-btn.main {
+  background: var(--pkd);
+  color: #fff;
+}
+.v-time {
+  color: var(--pink);
+  font: 16px 'VT323', monospace;
+  white-space: nowrap;
+}
+.v-prog {
+  flex: 1;
+  min-width: 100px;
+  height: 10px;
+  appearance: none;
+  background: #0f172a;
+  border: 2px solid var(--pd);
+  cursor: pointer;
+}
+.v-prog::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--pkd);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--pd);
+  cursor: pointer;
+}
+.v-vol {
+  width: 70px;
+  height: 8px;
+  appearance: none;
+  background: #0f172a;
+  border: 2px solid var(--pd);
+  cursor: pointer;
+}
+.v-vol::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--purple);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--pd);
+  cursor: pointer;
+}
+
+/* ─── REALISTIC THEATER SEATS (OVERLAPPING BOTTOM OF SCREEN) ─── */
+.seat-area {
+  width: 100%;
+  background: linear-gradient(180deg, #0f1d38, #070e1c);
+  border: 3px solid var(--pd);
+  border-top: none;
+  padding: 16px 20px 24px;
+  position: relative;
+  z-index: 35;
+  margin-top: -16px; /* Deliberate realistic overlap with screen frame */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+.seat-floor {
+  height: 6px;
+  background: repeating-linear-gradient(90deg, #1e3a8a 0 8px, #0f1d38 8px 16px);
+  margin-bottom: 14px;
+}
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.seat-row.row-back {
+  transform: scale(0.92);
+  opacity: 0.85;
+}
+.seat-row.row-front {
+  transform: scale(1);
+}
+
+.seat {
+  width: 38px;
+  height: 32px;
+  position: relative;
+  cursor: pointer;
+  background: linear-gradient(180deg, #1e40af, #172554);
+  border: 2px solid #3b82f6;
+  transition: transform 0.15s, background 0.15s;
+}
+.seat::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 2px;
+  right: 2px;
+  height: 11px;
+  background: linear-gradient(180deg, #2563eb, #1e3a8a);
+  border: 2px solid #3b82f6;
+  border-bottom: none;
+}
+.seat:hover {
+  background: linear-gradient(180deg, var(--pkd), #1e3a8a);
+  border-color: var(--pink);
+  transform: translateY(-3px);
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
+}
+.seat.taken {
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border-color: #334155;
+  cursor: default;
+}
+.seat.taken::before {
+  background: linear-gradient(180deg, #334155, #1e293b);
+  border-color: #334155;
+}
+.seat.selected {
+  background: linear-gradient(180deg, var(--pink), var(--pkd)) !important;
+  border-color: #fff !important;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.95) !important;
+}
+.seat.selected::after {
+  content: "♡";
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font: 14px 'VT323';
+}
+
+.seat-hint {
+  text-align: center;
+  color: var(--muted);
+  font: 17px 'VT323', monospace;
+  margin-top: 10px;
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+<div class="px-border px-border-t"></div>
+<div class="px-border px-border-b"></div>
+
+<!-- ─── THEATER AMBIENT DIM OVERLAY ─── -->
+<div class="theater-dim-overlay" id="theaterDimOverlay"></div>
+
+<!-- ─── 3D DOOR PAGE TRANSITION OVERLAY ─── -->
+<div class="page-transition" id="pageTransition">
+  <div class="tr-light"></div>
+  <div class="tr-door">
+    <div class="tr-panel left"></div>
+    <div class="tr-panel right"></div>
+  </div>
+</div>
+
+<!-- ─── TOP BAR WITH BACK BUTTON ─── -->
+<div class="media-topbar">
+  <button class="media-nav-btn main" id="backBtn">← KEMBALI</button>
+  <div class="theater-badge">♡ MINI THEATER ♡</div>
+</div>
+
+<div class="theater-stage-wrap">
+  <!-- ─── SISI KIRI: GULUNGAN FOTO PHOTOBOX (28 FOTO) ─── -->
+  <aside class="photo-stream stream-left" id="photoStreamLeft" aria-label="Galeri Kenangan Kiri">
+    <div class="stream-track" id="streamTrackLeft"></div>
+  </aside>
+
+  <main id="mediaMain">
+    <div class="theater-header">
+      <div class="kicker">RUANG 02 // A LITTLE GIFT FOR YOU</div>
+      <h1>I hope u like it:)</h1>
+      <p>Klik tirai nya untuk memulai♡</p>
+    </div>
+
+    <!-- ─── CINEMA ROOM ─── -->
+    <div class="cinema-room" id="cinemaRoom">
+
+      <!-- Pixel ceiling sconce lights -->
+      <div class="cinema-lights">
+        <div class="cinema-light"></div>
+        <div class="cinema-light"></div>
+        <div class="cinema-light"></div>
+        <div class="cinema-light"></div>
+        <div class="cinema-light"></div>
+        <div class="cinema-light"></div>
+      </div>
+
+      <!-- ─── DECORATIVE FAIRY LIGHTS (ILLUMINATES WHEN DIMMED) ─── -->
+      <div class="theater-fairy-lights">
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+        <span class="fairy-bulb"></span>
+      </div>
+
+      <!-- ─── CINEMA SCREEN ─── -->
+      <div class="screen-frame" id="screenFrame">
+        <video class="cinema-video" id="cinemaVideo" src="video.mp4" playsinline webkit-playsinline x5-playsinline preload="metadata"></video>
+        <img class="cinema-image" id="cinemaImage" alt="Media Romantis Kita">
+        <canvas id="fallbackCanvas"></canvas>
+
+        <!-- ─── INTERACTIVE VELVET CURTAINS ─── -->
+        <div class="curtain-wrap" id="curtainWrap" tabindex="0" role="button" aria-label="Buka tirai bioskop">
+          <div class="curtain-l" id="curtainL"></div>
+          <div class="curtain-hint" id="curtainHint">
+            <canvas id="curtainCanvas" width="36" height="30"></canvas>
+            <span>BUKA TIRAI ♡</span>
+          </div>
+          <div class="curtain-r" id="curtainR"></div>
+        </div>
+
+        <!-- Close Curtains Button -->
+        <button class="curtain-close-btn" id="curtainClose" aria-label="Tutup Tirai">✕ TUTUP</button>
+      </div>
+
+      <!-- ─── INTEGRATED THEATER CONTROLS ─── -->
+      <div class="theater-console">
+        <button class="v-btn main" id="vPlay">▶ PUTAR</button>
+        <button class="v-btn" id="vMute" title="Suara">🔊</button>
+        <input class="v-vol" id="vVol" type="range" min="0" max="1" step="0.05" value="1" title="Volume Suara">
+        <input class="v-prog" id="vProg" type="range" min="0" max="100" value="0" step="0.1" title="Linimasa">
+        <span class="v-time" id="vTime">00:00 / 00:00</span>
+        <button class="v-btn" id="vFull" title="Layar Penuh">⛶</button>
+      </div>
+
+      <!-- ─── SEATS (SLIGHTLY OVERLAPPING SCREEN BOTTOM) ─── -->
+      <div class="seat-area">
+        <div class="seat-floor"></div>
+        <!-- Decorative floor aisle pathway lights that illuminate when dimmed -->
+        <div class="aisle-lights-left">
+          <span class="aisle-dot"></span>
+          <span class="aisle-dot"></span>
+        </div>
+        <div class="aisle-lights-right">
+          <span class="aisle-dot"></span>
+          <span class="aisle-dot"></span>
+        </div>
+        <div class="seat-row row-back" id="seatRow1"></div>
+        <div class="seat-row row-front" id="seatRow2"></div>
+        <div class="seat-hint">✦ Click one seat beside me ♡ ✦</div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ─── SISI KANAN: GULUNGAN FOTO PHOTOBOX (27 FOTO) ─── -->
+  <aside class="photo-stream stream-right" id="photoStreamRight" aria-label="Galeri Kenangan Kanan">
+    <div class="stream-track" id="streamTrackRight"></div>
+  </aside>
+</div>
+
+<script>
+/* ─── 3D DOOR TRANSITION LOGIC ─── */
+(function() {
+  const tr = document.getElementById('pageTransition');
+  const back = document.getElementById('backBtn');
+
+  if (sessionStorage.getItem('fromDoor')) {
+    sessionStorage.removeItem('fromDoor');
+    tr.classList.add('active', 'open');
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        tr.classList.remove('open');
+        setTimeout(() => tr.classList.remove('active'), 500);
+      }, 150);
+    });
+  }
+
+  back.addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.setItem('unlockedGate', 'true');
+    sessionStorage.setItem('returnToDoor', 'true');
+    tr.classList.add('active', 'open');
+    setTimeout(() => {
+      window.location.href = 'index.html#memoryDoor';
+    }, 850);
+  });
+})();
+
+/* ─── DRAW PIXEL REEL ON CURTAIN HINT ─── */
+(function drawReel() {
+  const c = document.getElementById('curtainCanvas');
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(8, 4, 20, 22);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(10, 6, 16, 18);
+
+  // Sprockets
+  [[8, 6], [8, 12], [8, 18], [24, 6], [24, 12], [24, 18]].forEach(([x, y]) => {
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(x, y, 4, 3);
+  });
+
+  // Heart inside film
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(15, 11, 6, 4);
+  ctx.fillRect(14, 13, 8, 4);
+  ctx.fillRect(16, 17, 4, 3);
+})();
+
+/* ─── BUILD THEATER SEATS ─── */
+(function buildSeats() {
+  const row1 = document.getElementById('seatRow1');
+  const row2 = document.getElementById('seatRow2');
+  const ROW1_TOTAL = 7, ROW2_TOTAL = 9;
+  const taken1 = new Set([0, 6]), taken2 = new Set([0, 1, 7, 8]);
+  const special2 = new Set([4]); // center seat marked "us"
+
+  function populate(rowEl, count, takenSet, specialSet) {
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'seat' + (takenSet.has(i) ? ' taken' : '') + (specialSet.has(i) ? ' selected' : '');
+      s.title = takenSet.has(i) ? 'Sudah terisi' : specialSet.has(i) ? 'Khusus untuk kita berdua ♡' : 'Kursi kosong';
+      if (!takenSet.has(i)) {
+        s.addEventListener('click', () => {
+          s.classList.toggle('selected');
+        });
+      }
+      rowEl.appendChild(s);
+    }
+  }
+  populate(row1, ROW1_TOTAL, taken1, new Set());
+  populate(row2, ROW2_TOTAL, taken2, special2);
+})();
+
+
+/* ─── BUILD 55 PHOTOBOX STREAM CARDS (LEFT & RIGHT) ─── */
+(function initPhotoStreams() {
+  const leftTrack = document.getElementById('streamTrackLeft');
+  const rightTrack = document.getElementById('streamTrackRight');
+  if (!leftTrack || !rightTrack) return;
+
+  const TOTAL_PHOTOS = 55;
+
+  // Acak urutan foto agar dinamis, seru, dan tidak monoton/flat
+  const allPhotos = Array.from({ length: TOTAL_PHOTOS }, (_, i) => i + 1);
+  for (let i = allPhotos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allPhotos[i], allPhotos[j]] = [allPhotos[j], allPhotos[i]];
+  }
+
+  // Bagi rata ke sisi kiri (28 foto acak) dan sisi kanan (27 foto acak)
+  const leftCount = Math.ceil(TOTAL_PHOTOS / 2);
+  const leftPhotos = allPhotos.slice(0, leftCount);
+  const rightPhotos = allPhotos.slice(leftCount);
+
+
+  function createCard(num) {
+    const card = document.createElement('div');
+    card.className = 'photobox-card';
+
+    const img = document.createElement('img');
+    img.className = 'photobox-img';
+    img.decoding = 'async';
+    img.alt = `Kenangan Romantis Kita #${num}`;
+
+    // Cek thumbnail terlebih dahulu (ringan, tajam, bebas glitch & bebas kotak hijau), lalu fallback ke file asli
+    const extensions = [
+      `thumbs/thumb${num}.jpg`,
+      `foto${num}.jpg`,
+      `foto (${num}).jpg`,
+      `foto${num}.jpeg`,
+      `foto${num}.png`,
+      `foto${num}.webp`
+    ];
+    let extIdx = 0;
+    img.src = extensions[0];
+
+    img.onerror = function() {
+      extIdx++;
+      if (extIdx < extensions.length) {
+        img.src = extensions[extIdx];
+      } else {
+        // Fallback polaroid placeholder estetik jika file foto belum ditaruh di folder
+        img.onerror = null;
+        const ph = document.createElement('div');
+        ph.className = 'photobox-ph';
+        ph.innerHTML = `<span>📷</span><p>FOTO #${num}</p><small style="font-size:11px;color:var(--muted);font-family:'VT323';">♡ KITA ♡</small>`;
+        card.replaceChild(ph, img);
+      }
+    };
+
+    card.appendChild(img);
+
+    const bottom = document.createElement('div');
+    bottom.className = 'photobox-bottom';
+
+    const label = document.createElement('span');
+    label.className = 'photobox-label';
+    label.textContent = `#${String(num).padStart(2, '0')}`;
+
+    bottom.appendChild(label);
+
+    // Simbol love ♡ hanya di sebagian foto (misal kelipatan 3), tidak di semua foto
+    if (num % 3 === 0) {
+      const deco = document.createElement('span');
+      deco.className = 'photobox-deco';
+      deco.textContent = '♡';
+      bottom.appendChild(deco);
+    }
+
+    card.appendChild(bottom);
+
+    return card;
+  }
+
+  function populateTrack(track, photoNums) {
+    track.innerHTML = '';
+    // Duplikasi 2 set agar loop CSS marquee translateY(0%) -> translateY(-50%) mulus tanpa patah
+    const sets = [photoNums, photoNums];
+    sets.forEach((set) => {
+      set.forEach(num => {
+        track.appendChild(createCard(num));
+      });
+    });
+  }
+
+  populateTrack(leftTrack, leftPhotos);
+  populateTrack(rightTrack, rightPhotos);
+})();
+
+/* ─── THEATER CURTAIN, CUSTOM MEDIA & LIGHT DIMMING ─── */
+(function initCinema() {
+  const CFG = {
+    // Nama file media default di folder ini (kamu bisa ganti sesuai filemu, misal: 'video.mp4', 'kenangan.mp4', atau 'foto.jpg')
+    defaultMedia: 'video.mp4',
+    quotes: [
+      "SELAMAT ULANG TAHUN, SAYANGKU ♡",
+      "SETIAP DETIK BERSAMAMU TERASA SEPERTI FILM INDAH",
+      "CERITA CINTA FAVORITKU ADALAH KITA",
+      "SELALU DAN SELAMANYA DI SISIMU ✨"
+    ]
+  };
+
+  const room = document.getElementById('cinemaRoom');
+  const screenFrame = document.getElementById('screenFrame');
+  const curtainWrap = document.getElementById('curtainWrap');
+  const curtainClose = document.getElementById('curtainClose');
+  const vid = document.getElementById('cinemaVideo');
+  const img = document.getElementById('cinemaImage');
+  const fallbackCanvas = document.getElementById('fallbackCanvas');
+  const vPlay = document.getElementById('vPlay');
+  const vMute = document.getElementById('vMute');
+  const vVol = document.getElementById('vVol');
+  const vProg = document.getElementById('vProg');
+  const vTime = document.getElementById('vTime');
+  const vFull = document.getElementById('vFull');
+
+  let curtainOpen = false;
+  let muted = false;
+  let currentMode = 'video';
+  let fallbackRaf = null;
+
+  function fmt(s) {
+    if (!isFinite(s) || isNaN(s)) return '00:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    vid.style.display = (mode === 'video') ? 'block' : 'none';
+    img.style.display = (mode === 'image') ? 'block' : 'none';
+    fallbackCanvas.style.display = (mode === 'canvas') ? 'block' : 'none';
+    vPlay.textContent = (mode === 'video' && !vid.paused) ? '⏸ JEDA' : '▶ PUTAR';
+  }
+
+  /* Photo Stream Scroll Controllers */
+  function startPhotoScroll() {
+    const leftStream = document.getElementById('photoStreamLeft');
+    const rightStream = document.getElementById('photoStreamRight');
+    if (leftStream) leftStream.classList.add('scrolling');
+    if (rightStream) rightStream.classList.add('scrolling');
+  }
+
+  function pausePhotoScroll() {
+    const leftStream = document.getElementById('photoStreamLeft');
+    const rightStream = document.getElementById('photoStreamRight');
+    if (leftStream) leftStream.classList.remove('scrolling');
+    if (rightStream) rightStream.classList.remove('scrolling');
+  }
+
+  /* Curtain Open: Dim lights & Play Video */
+  function openCurtain() {
+    if (curtainOpen) return;
+    curtainOpen = true;
+
+    curtainWrap.classList.add('open');
+    room.classList.add('cinema-dim');
+    document.body.classList.add('theater-dimmed');
+
+    startPlayback();
+  }
+
+  /* Curtain Close: Restore lights & Pause Video */
+  function closeCurtain() {
+    if (!curtainOpen) return;
+    curtainOpen = false;
+
+    curtainWrap.classList.remove('open');
+    room.classList.remove('cinema-dim');
+    document.body.classList.remove('theater-dimmed');
+
+    pausePlayback();
+  }
+
+  curtainWrap.addEventListener('click', openCurtain);
+  curtainClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeCurtain();
+  });
+
+  /* Playback logic - handal di mobile dan desktop */
+  function startPlayback() {
+    startPhotoScroll();
+    setMode('video');
+
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        vPlay.textContent = '⏸ JEDA';
+      }).catch((err) => {
+        console.warn('Mobile autoplay policy, attempting muted play:', err);
+        vid.muted = true;
+        vid.play().then(() => {
+          vPlay.textContent = '⏸ JEDA';
+          vMute.textContent = '🔇';
+        }).catch(() => {
+          vPlay.textContent = '▶ PUTAR';
+        });
+      });
+    }
+  }
+
+  function pausePlayback() {
+    pausePhotoScroll();
+    if (!vid.paused) {
+      vid.pause();
+    }
+    vPlay.textContent = '▶ PUTAR';
+  }
+
+  vPlay.addEventListener('click', () => {
+    if (!curtainOpen) {
+      openCurtain();
+      return;
+    }
+    if (vid.paused) {
+      startPlayback();
+    } else {
+      pausePlayback();
+    }
+  });
+
+  vid.addEventListener('play', () => {
+    vPlay.textContent = '⏸ JEDA';
+    startPhotoScroll();
+  });
+  vid.addEventListener('pause', () => {
+    vPlay.textContent = '▶ PUTAR';
+    pausePhotoScroll();
+  });
+  vid.addEventListener('ended', () => {
+    vPlay.textContent = '▶ PUTAR';
+    pausePhotoScroll();
+  });
+
+  /* Inisialisasi video langsung siap putar */
+  setMode('video');
+  vid.src = 'video.mp4';
+
+  /* Video time & scrub */
+  vid.addEventListener('timeupdate', () => {
+    if (vid.duration) {
+      vProg.value = (vid.currentTime / vid.duration) * 100;
+      vTime.textContent = `${fmt(vid.currentTime)} / ${fmt(vid.duration)}`;
+    }
+  });
+  vProg.addEventListener('input', () => {
+    if (currentMode === 'video' && vid.duration) {
+      vid.currentTime = (vProg.value / 100) * vid.duration;
+    }
+  });
+
+  /* Volume */
+  vVol.addEventListener('input', () => {
+    vid.volume = +vVol.value;
+    vid.muted = (+vVol.value === 0);
+    vMute.textContent = vid.muted ? '🔇' : '🔊';
+  });
+  vMute.addEventListener('click', () => {
+    muted = !muted;
+    vid.muted = muted;
+    vMute.textContent = muted ? '🔇' : '🔊';
+  });
+
+  /* Fullscreen (Universal Mobile iOS/Android & Desktop) */
+  vFull.addEventListener('click', () => {
+    // 1. Khusus iOS Safari (iPhone / iPad) - wajib memanggil pemutar video native fullscreen
+    if (vid.webkitEnterFullscreen && typeof vid.webkitEnterFullscreen === 'function') {
+      try {
+        vid.webkitEnterFullscreen();
+        return;
+      } catch (e) {
+        console.warn('iOS webkitEnterFullscreen fallback:', e);
+      }
+    }
+
+    // 2. Browser standard (Android Chrome, PC, Laptop, Mac)
+    const isFull = document.fullscreenElement || 
+                   document.webkitFullscreenElement || 
+                   document.mozFullScreenElement || 
+                   document.msFullscreenElement;
+
+    if (!isFull) {
+      const target = screenFrame || vid;
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(() => vid.requestFullscreen?.());
+      } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+      } else if (target.webkitRequestFullScreen) {
+        target.webkitRequestFullScreen();
+      } else if (target.msRequestFullscreen) {
+        target.msRequestFullscreen();
+      } else if (vid.requestFullscreen) {
+        vid.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  });
+
+  /* ─── ROMANTIC CANVAS VISUALS (FALLBACK) ─── */
+  const fCtx = fallbackCanvas.getContext('2d');
+  let fTime = 0;
+
+  function runFallback() {
+    fallbackCanvas.width = 640;
+    fallbackCanvas.height = 360;
+
+    function render() {
+      fTime += 0.015;
+      fCtx.fillStyle = '#060e1d';
+      fCtx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+
+      // Pixel star grid
+      fCtx.fillStyle = '#fff';
+      for (let i = 0; i < 40; i++) {
+        const sx = (i * 47 + Math.sin(fTime + i) * 10) % fallbackCanvas.width;
+        const sy = (i * 31 + fTime * 8) % fallbackCanvas.height;
+        fCtx.globalAlpha = Math.abs(Math.sin(fTime * 2 + i));
+        fCtx.fillRect(sx, sy, 3, 3);
+      }
+      fCtx.globalAlpha = 1;
+
+      // Center glowing heart
+      const hScale = 1 + Math.sin(fTime * 2.5) * 0.08;
+      fCtx.save();
+      fCtx.translate(fallbackCanvas.width / 2, fallbackCanvas.height / 2 - 25);
+      fCtx.scale(hScale, hScale);
+      fCtx.fillStyle = '#38bdf8';
+      // pixel heart path
+      const p = [
+        [-30,-15,20,20], [-10,-25,20,20], [10,-15,20,20],
+        [-30,5,60,20], [-20,25,40,20], [-10,45,20,15]
+      ];
+      p.forEach(([x, y, w, h]) => fCtx.fillRect(x, y, w, h));
+      fCtx.restore();
+
+      // Cycling romantic captions in Indonesian
+      const qIdx = Math.floor(fTime * 0.3) % CFG.quotes.length;
+      fCtx.font = '26px "VT323", monospace';
+      fCtx.fillStyle = '#fff';
+      fCtx.textAlign = 'center';
+      fCtx.fillText(CFG.quotes[qIdx], fallbackCanvas.width / 2, fallbackCanvas.height / 2 + 90);
+
+      vProg.value = (fTime * 4) % 100;
+      vTime.textContent = `${fmt(fTime * 5)} / 05:00`;
+
+      fallbackRaf = requestAnimationFrame(render);
+    }
+    if (fallbackRaf) cancelAnimationFrame(fallbackRaf);
+    fallbackRaf = requestAnimationFrame(render);
+  }
+})();
+</script>
+</body>
+</html>
